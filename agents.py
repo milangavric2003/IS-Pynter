@@ -141,4 +141,30 @@ class MaxNAgent(Agent):
         time.sleep(0.5)
         return maxN(state, 0, max_depth)
 
+def negamaxAB(state, depth, max_depth, old_state, a, b):
+    if depth == max_depth or state.is_goal_state():
+        return state_evaluation(state, old_state, depth) * (-1 if depth % 2 == 1 else 1)
+
+    best_action = None
+    # MAX player
+    score = float('-inf')
+    best_score = None
+    for action in state.get_legal_actions():
+        new_state = state.generate_successor_state(action)
+        score = max(score, -negamaxAB(new_state, depth + 1, max_depth, state, -b, -a))
+        if (best_score is None and best_action is None) or score > best_score:
+            best_action = action
+            best_score = score
+        # alpha update
+        a = max(a, score)
+        if a >= b: break
+
+    return best_action if depth == 0 else score
+
+
+class NegamaxABAgent(Agent):
+
+    def get_chosen_action(self, state, max_depth):
+        time.sleep(0.5)
+        return negamaxAB(state, 0, max_depth, state, float('-inf'), float('inf'))
 
