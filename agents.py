@@ -116,5 +116,29 @@ class MinimaxABAgent(Agent):
         time.sleep(0.5)
         return minimaxAB(state, 0, max_depth, state, float('-inf'), float('inf'))
 
+def state_evaluation_maxN(state):
+    return state.get_scores()
+
+def maxN(state, depth, max_depth):
+    if depth == max_depth or state.is_goal_state():
+        return state_evaluation_maxN(state)
+
+    best_action = None
+    score_list = dict() # = [-float('inf') for i in range(len(state.get_scores()))]
+    i = state.get_on_move_chr()
+    for action in state.get_legal_actions():
+        new_state = state.generate_successor_state(action)
+        child_score_list = maxN(new_state, depth + 1, max_depth)
+        if i not in score_list or score_list[i] < child_score_list[i]:
+            score_list = child_score_list
+            best_action = action
+
+    return best_action if depth == 0 else score_list
+
+class MaxNAgent(Agent):
+
+    def get_chosen_action(self, state, max_depth):
+        time.sleep(0.5)
+        return maxN(state, 0, max_depth)
 
 
